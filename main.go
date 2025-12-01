@@ -86,11 +86,11 @@ func createFullVersion(inputPath, outputPath string) {
 		err := runFFmpeg(
 			"-i", inputPath,
 			"-an",
-			"-vf", "scale=-2:'min(1440,ih)'",
+			"-vf", "scale=-2:'min(720,ih)'",
 			"-c:v", "h264_nvenc",
 			"-preset", "slow",
 			"-rc", "vbr",
-			"-b:v", "16M",
+			"-b:v", "3M",
 			"-tune", "hq",
 			"-multipass", "2",
 			"-movflags", "+faststart",

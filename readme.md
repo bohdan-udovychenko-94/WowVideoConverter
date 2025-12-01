@@ -23,4 +23,4 @@ Both versions are saved into your `Videos` folder with prefixes `short_` and `fu
 To build the executable with minimized binary size, run:
 
 ```bash
-go build -ldflags="-s -w" -o bin/wow_encoder.exe
+go build -ldflags="-s -w" -o bin/WowVideoConverter.exe
