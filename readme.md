@@ -3,7 +3,7 @@
 This Go program processes `.mp4` videos located in your `Videos\NVIDIA\World Of Warcraft` folder and creates two versions for each video:
 
 - **Short version:** last 60 seconds, vertical 1080x1920 resolution  
-- **Full version:** full length, scaled to max height 1440, keeping aspect ratio  
+- **Full version:** full length, scaled to max height 720, keeping aspect ratio  
 
 Both versions are saved into your `Videos` folder with prefixes `short_` and `full_`.
 
