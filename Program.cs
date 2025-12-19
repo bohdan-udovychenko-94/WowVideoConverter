@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 try
 {
     if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("USERPROFILE")))
