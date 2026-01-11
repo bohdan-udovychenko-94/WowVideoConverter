@@ -32,7 +32,7 @@ try
         CreateShortVersion(path, Path.Combine(videosFolder, "short_" + Path.GetFileName(path)));
         CreateFullVersion(path, Path.Combine(videosFolder, "full_" + Path.GetFileName(path)));
 
-        Console.WriteLine($"  Time taken: {(DateTime.Now - startTime).TotalSeconds:F0} seconds\n");
+        Console.WriteLine($"Time taken: {(DateTime.Now - startTime).TotalSeconds:F0} seconds\n");
     }
 
     Console.WriteLine($"Script finished at: {DateTime.Now:HH:mm:ss}");
@@ -46,11 +46,11 @@ static void CreateShortVersion(string inputPath, string outputPath)
 {
     if (File.Exists(outputPath))
     {
-        Console.WriteLine("  Short version already exists, skipping.");
+        Console.WriteLine("Short version already exists, skipping.");
         return;
     }
 
-    Console.WriteLine($"  Creating short version: {outputPath}");
+    Console.WriteLine($"Creating short version: {outputPath}");
     RunFFmpeg(
         "-sseof", "-60",
         "-i", inputPath,
@@ -93,10 +93,11 @@ static void CreateFullVersion(string inputPath, string outputPath)
 
 static void RunFFmpeg(params string[] args)
 {
+    var quotedArgs = args.Select(arg => $"\"{arg}\"");
     var process = Process.Start(new ProcessStartInfo
     {
         FileName = "ffmpeg",
-        Arguments = string.Join(" ", args),
+        Arguments = string.Join(" ", quotedArgs),
         UseShellExecute = false,
         CreateNoWindow = false
     });

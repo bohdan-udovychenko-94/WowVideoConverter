@@ -1,9 +1,9 @@
 # WoW Video Encoder
 
-This Go program processes `.mp4` videos located in your `Videos\NVIDIA\World Of Warcraft` folder and creates two versions for each video:
+This C# console application processes `.mp4` videos located in your `Videos\NVIDIA\World Of Warcraft` folder and creates two versions for each video:
 
 - **Short version:** last 60 seconds, vertical 1080x1920 resolution  
-- **Full version:** full length, scaled to max height 720, keeping aspect ratio  
+- **Full version:** full length, scaled to max height 1440, keeping aspect ratio  
 
 Both versions are saved into your `Videos` folder with prefixes `short_` and `full_`.
 
@@ -14,13 +14,31 @@ Both versions are saved into your `Videos` folder with prefixes `short_` and `fu
 - Windows OS  
 - [FFmpeg](https://ffmpeg.org/download.html) installed and accessible via system `PATH`  
 - NVIDIA GPU with NVENC support (optional but recommended for hardware acceleration)  
-- Go installed (for building the program)  
 
 ---
 
 ## Build
 
-To build the executable with minimized binary size, run:
+To build the standalone executable, run:
 
 ```bash
-go build -ldflags="-s -w" -o bin/WowVideoConverter.exe
+dotnet publish -c Release --self-contained -p:PublishSingleFile=true
+```
+
+The executable will be created in `release/WowVideoConverter.exe` - a single file containing all dependencies, no DLLs needed.
+
+---
+
+## Usage
+
+Run the executable:
+
+```bash
+WowVideoConverter.exe
+```
+
+It will automatically:
+1. Scan for `.mp4` files in `Videos\NVIDIA\World Of Warcraft`
+2. Create short and full versions if they don't already exist
+3. Save processed videos to your `Videos` folder
+4. Display progress and timing information
