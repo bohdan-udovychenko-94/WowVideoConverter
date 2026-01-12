@@ -1,19 +1,19 @@
 # WoW Video Encoder
 
-This C# console application processes `.mp4` videos located in your `Videos\NVIDIA\World Of Warcraft` folder and creates two versions for each video:
+This C# console application processes `.mp4` videos located in your `{WOW_VIDEO_CONVERTER_BASE_INPUT_FOLDER}` folder and subfolders and creates two versions for each video:
 
 - **Short version:** last 60 seconds, vertical 1080x1920 resolution  
-- **Full version:** full length, scaled to max height 1440, keeping aspect ratio  
+- **Full version:** full length, 1080p
 
-Both versions are saved into your `Videos` folder with prefixes `short_` and `full_`.
+Both versions are saved into `{USERPROFILE}\Videos\WowVideoConverter` folder with prefixes `short_` and `full_`.
 
 ---
 
 ## Prerequisites
 
 - Windows OS  
-- [FFmpeg](https://ffmpeg.org/download.html) installed and accessible via system `PATH`  
-- NVIDIA GPU with NVENC support (optional but recommended for hardware acceleration)  
+- [FFmpeg](https://ffmpeg.org/download.html) installed and accessible via system `PATH`
+- `{WOW_VIDEO_CONVERTER_BASE_INPUT_FOLDER}` env variable contanis path to folder with source videos
 
 ---
 
@@ -25,7 +25,7 @@ To build the standalone executable, run:
 dotnet publish -c Release --self-contained -p:PublishSingleFile=true
 ```
 
-The executable will be created in `release/WowVideoConverter.exe` - a single file containing all dependencies, no DLLs needed.
+The executable will be created in `bin/Release/<net-version>/<cpu-architecture>/publish/WowVideoConverter.exe` - a single file containing all dependencies, no DLLs needed.
 
 ---
 
