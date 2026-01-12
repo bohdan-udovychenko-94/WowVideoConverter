@@ -31,14 +31,10 @@ The executable will be created in `bin/Release/<net-version>/<cpu-architecture>/
 
 ## Usage
 
-Run the executable:
-
-```bash
-WowVideoConverter.exe
-```
+Run the executable `WowVideoConverter.exe`
 
 It will automatically:
-1. Scan for `.mp4` files in `Videos\NVIDIA\World Of Warcraft`
+1. Scan for `.mp4` files in `{WOW_VIDEO_CONVERTER_BASE_INPUT_FOLDER}` folder
 2. Create short and full versions if they don't already exist
-3. Save processed videos to your `Videos` folder
+3. Save processed videos to your `{USERPROFILE}\Videos\WowVideoConverter` folder
 4. Display progress and timing information
