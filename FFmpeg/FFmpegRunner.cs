@@ -48,10 +48,10 @@ static class FFmpegRunner
                 if (prop.Attr.Name is not null)
                 {
                     yield return $"\"{prop.Attr.Name}\"";
-                }     
+                }
 
                 yield return $"\"{str}\"";
-            }         
+            }
         }
     }
 }

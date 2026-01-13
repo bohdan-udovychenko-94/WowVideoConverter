@@ -8,42 +8,33 @@ class Program
     {
         try
         {
-            string? userProfileFolder = Environment.GetEnvironmentVariable("USERPROFILE");
-            if (string.IsNullOrWhiteSpace(userProfileFolder))
+            string? inputFolder = Environment.GetEnvironmentVariable("WOW_VIDEO_CONVERTER_INPUT_FOLDER");
+            if (string.IsNullOrWhiteSpace(inputFolder))
             {
-                Console.Error.WriteLine("Environment variable USERPROFILE is not found");
-                Console.ReadLine();
-                return;
+                throw new InvalidOperationException("Environment variable WOW_VIDEO_CONVERTER_INPUT_FOLDER is not found");
             }
+            Console.WriteLine($"Input folder: {inputFolder}");
 
-            string? baseInputFolder = Environment.GetEnvironmentVariable("WOW_VIDEO_CONVERTER_BASE_INPUT_FOLDER");
-            if (string.IsNullOrWhiteSpace(baseInputFolder))
+            string? outputFolder = Environment.GetEnvironmentVariable("WOW_VIDEO_CONVERTER_OUTPUT_FOLDER");
+            if (string.IsNullOrWhiteSpace(outputFolder))
             {
-                Console.Error.WriteLine("Environment variable WOW_VIDEO_CONVERTER_BASE_INPUT_FOLDER is not found");
-                Console.ReadLine();
-                return;
+                throw new InvalidOperationException("Environment variable WOW_VIDEO_CONVERTER_OUTPUT_FOLDER is not found");
             }
-
-            string videosFolder = Path.Combine(userProfileFolder, "Videos");
-            Console.WriteLine($"Input folder: {baseInputFolder}");
-            string baseOutputFolder = Path.Combine(videosFolder, "WowVideoConverter");
-            Console.WriteLine($"Base output folder: {baseOutputFolder}");
+            Console.WriteLine($"Output folder: {outputFolder}");
             Console.WriteLine();
 
             Console.WriteLine($"Script started at: {DateTime.Now:HH:mm:ss}");
             Console.WriteLine();
 
-            if (!Directory.Exists(baseInputFolder))
+            if (!Directory.Exists(inputFolder))
             {
-                Console.Error.WriteLine("Input folder not found.");
-                Console.ReadLine();
-                return;
+                throw new DirectoryNotFoundException($"Input folder not found: {inputFolder}");
             }
 
             string codec = GetCodec();
             Console.WriteLine($"Selected codec: {codec}");
 
-            foreach (var inputPath in Directory.EnumerateFiles(baseInputFolder, "*.mp4", SearchOption.AllDirectories))
+            foreach (var inputPath in Directory.EnumerateFiles(inputFolder, "*.mp4", SearchOption.AllDirectories))
             {
                 Console.WriteLine($"Processing: {Path.GetFileName(inputPath)}");
                 var startTime = DateTime.Now;
@@ -52,13 +43,13 @@ class Program
                 string PreparePath(string fileNamePrefix)
                 {
                     string outputPath = inputPath
-                        .Replace(baseInputFolder, baseOutputFolder)
+                        .Replace(inputFolder, outputFolder)
                         .Replace(inputFileName, fileNamePrefix + inputFileName);
-                    
-                    string outputFolder = Path.GetDirectoryName(outputPath)!;
-                    if(!Directory.Exists(outputFolder))
+
+                    string outputSubFolder = Path.GetDirectoryName(outputPath)!;
+                    if (!Directory.Exists(outputSubFolder))
                     {
-                        Directory.CreateDirectory(outputFolder);  
+                        Directory.CreateDirectory(outputSubFolder);
                     }
 
                     return outputPath;
@@ -86,19 +77,24 @@ class Program
     {
         string output = FFmpegRunner.Run(new AvailableEncodersFFmpegCommand(), redirectStandardOutput: true);
 
-        if(output.Contains("h264_nvenc", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains("h264_nvenc", StringComparison.OrdinalIgnoreCase))
         {
             return "h264_nvenc"; // for NVIDIA GPU
         }
 
-        if(output.Contains("h264_amf", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains("h264_amf", StringComparison.OrdinalIgnoreCase))
         {
             return "h264_amf"; // for AMD GPU
         }
 
-        if(output.Contains("h264_qsv", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains("h264_qsv", StringComparison.OrdinalIgnoreCase))
         {
             return "h264_qsv"; // for // INTEL GPU
+        }
+
+        if (output.Contains("h264_videotoolbox", StringComparison.OrdinalIgnoreCase))
+        {
+            return "h264_videotoolbox"; // for Mac M GPU
         }
 
         // Software encoder, slower but widely supported, full feature set. (use CPU)

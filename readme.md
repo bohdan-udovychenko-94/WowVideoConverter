@@ -1,31 +1,55 @@
 # WoW Video Encoder
 
-This C# console application processes `.mp4` videos located in your `{WOW_VIDEO_CONVERTER_BASE_INPUT_FOLDER}` folder and subfolders and creates two versions for each video:
+This C# console application processes `.mp4` videos located in your source folder (defined by `WOW_VIDEO_CONVERTER_INPUT_FOLDER`) and its subfolders, and creates two versions for each video in the destination folder (defined by `WOW_VIDEO_CONVERTER_OUTPUT_FOLDER`):
 
 - **Short version:** last 60 seconds, vertical 1080x1920 resolution  
 - **Full version:** full length, 1080p
 
-Both versions are saved into `{USERPROFILE}\Videos\WowVideoConverter` folder with prefixes `short_` and `full_`.
+Both versions are saved into the `{WOW_VIDEO_CONVERTER_OUTPUT_FOLDER}` folder, mirroring the input structure, with prefixes `short_` and `full_`.
 
 ---
 
 ## Prerequisites
 
-- Windows OS  
+- Windows, macOS, or Linux  
 - [FFmpeg](https://ffmpeg.org/download.html) installed and accessible via system `PATH`
-- `{WOW_VIDEO_CONVERTER_BASE_INPUT_FOLDER}` env variable contanis path to folder with source videos
+- `WOW_VIDEO_CONVERTER_INPUT_FOLDER` env variable contains the path to the folder with source videos.
+- `WOW_VIDEO_CONVERTER_OUTPUT_FOLDER` env variable contains the path where processed videos will be saved.
 
 ---
 
 ## Build
 
-To build the standalone executable, run:
+### Standard Build (Cross-platform)
+
+To build the project:
 
 ```bash
-dotnet publish -c Release --self-contained -p:PublishSingleFile=true
+dotnet build -c Release
 ```
 
-The executable will be created in `bin/Release/<net-version>/<cpu-architecture>/publish/WowVideoConverter.exe` - a single file containing all dependencies, no DLLs needed.
+The application can then be run using `dotnet WowVideoConverter.dll` from the output directory.
+
+### Build Standalone Executable (Platform-specific)
+
+Since `<OutputType>Exe</OutputType>` has been removed from the project file to support cross-platform builds, you **must** specify a Runtime Identifier (`-r`) when publishing to create a standalone executable.
+
+**Windows (x64):**
+```bash
+dotnet publish -c Release -r win-x64
+```
+
+**macOS (Apple Silicon):**
+```bash
+dotnet publish -c Release -r osx-arm64
+```
+
+**Linux (x64):**
+```bash
+dotnet publish -c Release -r linux-x64
+```
+
+The executable (e.g., `WowVideoConverter.exe` on Windows) will be created in the `bin/Release/<target-framework>/<runtime-identifier>/publish/` folder. All publishing settings like `PublishSingleFile` and `PublishTrimmed` are already configured in the `.csproj` file.
 
 ---
 
@@ -34,7 +58,7 @@ The executable will be created in `bin/Release/<net-version>/<cpu-architecture>/
 Run the executable `WowVideoConverter.exe`
 
 It will automatically:
-1. Scan for `.mp4` files in `{WOW_VIDEO_CONVERTER_BASE_INPUT_FOLDER}` folder
+1. Scan for `.mp4` files in the `WOW_VIDEO_CONVERTER_INPUT_FOLDER` folder
 2. Create short and full versions if they don't already exist
-3. Save processed videos to your `{USERPROFILE}\Videos\WowVideoConverter` folder
+3. Save processed videos to the `WOW_VIDEO_CONVERTER_OUTPUT_FOLDER` folder, mirroring the input subfolder structure
 4. Display progress and timing information
