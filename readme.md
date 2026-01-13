@@ -1,6 +1,6 @@
 # WoW Video Encoder
 
-This C# console application processes `.mp4` videos located in your source folder (defined by `WOW_VIDEO_CONVERTER_INPUT_FOLDER`) and its subfolders, and creates two versions for each video in the destination folder (defined by `WOW_VIDEO_CONVERTER_OUTPUT_FOLDER`):
+This C# console application processes videos located in your source folder (defined by `WOW_VIDEO_CONVERTER_INPUT_FOLDER`) and its subfolders, and creates two versions for each video in the destination folder (defined by `WOW_VIDEO_CONVERTER_OUTPUT_FOLDER`):
 
 - **Short version:** last 60 seconds, vertical 1080x1920 resolution  
 - **Full version:** full length, 1080p
@@ -58,7 +58,7 @@ The executable (e.g., `WowVideoConverter.exe` on Windows) will be created in the
 Run the executable `WowVideoConverter.exe`
 
 It will automatically:
-1. Scan for `.mp4` files in the `WOW_VIDEO_CONVERTER_INPUT_FOLDER` folder
+1. Scan for video files in the `WOW_VIDEO_CONVERTER_INPUT_FOLDER` folder
 2. Create short and full versions if they don't already exist
 3. Save processed videos to the `WOW_VIDEO_CONVERTER_OUTPUT_FOLDER` folder, mirroring the input subfolder structure
 4. Display progress and timing information

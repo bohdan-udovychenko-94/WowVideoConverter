@@ -34,25 +34,29 @@ class Program
             string codec = GetCodec();
             Console.WriteLine($"Selected codec: {codec}");
 
-            foreach (var inputPath in Directory.EnumerateFiles(inputFolder, "*.mp4", SearchOption.AllDirectories))
+            var inputPathes = Directory.EnumerateFiles(inputFolder, "*.*", SearchOption.AllDirectories)
+                .Where(file => Constants.VideoExtensions.All.Contains(Path.GetExtension(file)));
+
+            foreach (var inputPath in inputPathes)
             {
                 Console.WriteLine($"Processing: {Path.GetFileName(inputPath)}");
                 var startTime = DateTime.Now;
                 string inputFileName = Path.GetFileName(inputPath);
+                string inputExtension = Path.GetExtension(inputPath);
 
                 string PreparePath(string fileNamePrefix)
                 {
-                    string outputPath = inputPath
-                        .Replace(inputFolder, outputFolder)
-                        .Replace(inputFileName, fileNamePrefix + inputFileName);
+                    // Ensure the output is always .mp4 for consistency, even if input is .mkv etc.
+                    string outputFileName = fileNamePrefix + Path.GetFileNameWithoutExtension(inputFileName) + Constants.VideoExtensions.Mp4;
+                    string relativePath = Path.GetDirectoryName(Path.GetRelativePath(inputFolder, inputPath)) ?? string.Empty;
+                    string outputSubFolder = Path.Combine(outputFolder, relativePath);
 
-                    string outputSubFolder = Path.GetDirectoryName(outputPath)!;
                     if (!Directory.Exists(outputSubFolder))
                     {
                         Directory.CreateDirectory(outputSubFolder);
                     }
 
-                    return outputPath;
+                    return Path.Combine(outputSubFolder, outputFileName);
                 }
 
                 string shortVideOutputPath = PreparePath("short_");
@@ -77,33 +81,33 @@ class Program
     {
         string output = FFmpegRunner.Run(new AvailableEncodersFFmpegCommand(), redirectStandardOutput: true);
 
-        if (output.Contains("h264_nvenc", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains(FFmpegConstants.VideoCodecs.H264Nvenc, StringComparison.OrdinalIgnoreCase))
         {
-            return "h264_nvenc"; // for NVIDIA GPU
+            return FFmpegConstants.VideoCodecs.H264Nvenc; // for NVIDIA GPU
         }
 
-        if (output.Contains("h264_amf", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains(FFmpegConstants.VideoCodecs.H264Amf, StringComparison.OrdinalIgnoreCase))
         {
-            return "h264_amf"; // for AMD GPU
+            return FFmpegConstants.VideoCodecs.H264Amf; // for AMD GPU
         }
 
-        if (output.Contains("h264_qsv", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains(FFmpegConstants.VideoCodecs.H264Qsv, StringComparison.OrdinalIgnoreCase))
         {
-            return "h264_qsv"; // for // INTEL GPU
+            return FFmpegConstants.VideoCodecs.H264Qsv; // for INTEL GPU
         }
 
-        if (output.Contains("h264_videotoolbox", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains(FFmpegConstants.VideoCodecs.H264VideoToolbox, StringComparison.OrdinalIgnoreCase))
         {
-            return "h264_videotoolbox"; // for Mac M GPU
+            return FFmpegConstants.VideoCodecs.H264VideoToolbox; // for Mac M GPU
         }
 
         // Software encoder, slower but widely supported, full feature set. (use CPU)
-        if (output.Contains("libx264", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains(FFmpegConstants.VideoCodecs.Libx264, StringComparison.OrdinalIgnoreCase))
         {
-            return "libx264";
+            return FFmpegConstants.VideoCodecs.Libx264;
         }
 
-        return "h264";
+        return FFmpegConstants.VideoCodecs.H264;
     }
 
     static void CreateShortVersion(string inputPath, string outputPath, string codec)
@@ -125,11 +129,11 @@ class Program
             // Two-pass encoding improves quality/bitrate distribution, especially at constrained bitrates
             Multipass = "2",
             // Adjusts encoding speed vs quality trade-off. "slow" -> higher quality
-            Preset = "slow",
-            RateControl = "vbr",
+            Preset = FFmpegConstants.Presets.Slow,
+            RateControl = FFmpegConstants.RateControls.Vbr,
             StartOffset = "-60",
             // Optimizes encoding for a specific quality or type of content. "hq" = high quality
-            Tune = "hq",
+            Tune = FFmpegConstants.Tunes.Hq,
             VideoCodec = codec,
             // Video filter chain applied during encoding:
             // - scale=-2:1920 -> scale height to 1920px,
@@ -158,10 +162,10 @@ class Program
             // Two-pass encoding improves quality/bitrate distribution, especially at constrained bitrates
             Multipass = "2",
             // Adjusts encoding speed vs quality trade-off. "slow" -> higher quality
-            Preset = "slow",
-            RateControl = "vbr",
+            Preset = FFmpegConstants.Presets.Slow,
+            RateControl = FFmpegConstants.RateControls.Vbr,
             // Optimizes encoding for a specific quality or type of content. "hq" = high quality.
-            Tune = "hq",
+            Tune = FFmpegConstants.Tunes.Hq,
             VideoCodec = codec,
             // Video filter chain applied during encoding:
             // scale=-2:'min(1080,ih)' -> scales height to 1080px, width adjusted to preserve aspect ratio
